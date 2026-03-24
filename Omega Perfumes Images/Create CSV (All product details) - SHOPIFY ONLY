@@ -1,0 +1,75 @@
+$baseUrl = "https://belvish.com/"
+$outputFile = "C:\Omega Enterprises\products.csv"
+
+New-Item -ItemType Directory -Force -Path "C:\Omega Enterprises" | Out-Null
+
+$data = @()
+$page = 1
+
+function Clean-Text($text) {
+    return ($text -replace "`r|`n", " ").Trim()
+}
+
+while ($true) {
+    $url = "$baseUrl/products.json?limit=250&page=$page"
+    Write-Host "Fetching page $page..."
+
+    try {
+        $response = Invoke-RestMethod -Uri $url -Method Get
+    } catch {
+        break
+    }
+
+    if ($response.products.Count -eq 0) {
+        break
+    }
+
+    foreach ($product in $response.products) {
+
+        foreach ($variant in $product.variants) {
+
+            # Image (first image only)
+            $imageSrc = ""
+            $imageAlt = ""
+
+            if ($product.images.Count -gt 0) {
+                $imageSrc = $product.images[0].src
+                $imageAlt = $product.images[0].alt
+            }
+
+            # Options
+            $option1Name = ""
+            $option1Value = $variant.option1
+
+            if ($product.options.Count -gt 0) {
+                $option1Name = $product.options[0].name
+            }
+
+            $row = [PSCustomObject]@{
+                "Handle" = $product.handle
+                "Title" = $product.title
+                "Body (HTML)" = Clean-Text($product.body_html)
+                "Tags" = $product.tags
+                "Option1 Name" = $option1Name
+                "Option1 Value" = $option1Value
+                "Variant Price" = $variant.price
+                "Variant Compare At Price" = $variant.compare_at_price
+                "Image Src" = $imageSrc
+                "Image Alt Text" = $imageAlt
+                "SEO Title" = ""
+                "SEO Description" = ""
+                "Google Product Category" = ""
+                "Search product boosts" = ""
+            }
+
+            $data += $row
+        }
+    }
+
+    $page++
+}
+
+# Export CSV
+$data | Export-Csv -Path $outputFile -NoTypeInformation -Encoding UTF8
+
+Write-Host "✅ CSV exported to $outputFile"
