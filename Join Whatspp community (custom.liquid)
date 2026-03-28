@@ -1,0 +1,127 @@
+<div style="
+  text-align:center;
+  padding:32px;
+  border-radius:22px;
+  background:linear-gradient(135deg, rgba(17,47,33,0.97), rgba(35,182,113,0.97));
+  color:#ffffff;
+  max-width:540px;
+  margin:auto;
+  position:relative;
+  overflow:hidden;
+
+  /* Richer soft glow */
+  box-shadow:
+      0 0 28px rgba(31,174,103,0.75),
+      0 0 68px rgba(31,174,103,0.55),
+      inset 0 0 18px rgba(31,174,103,0.4);
+  animation: glowPulse 4.5s ease-in-out infinite;
+">
+
+  <!-- Multi-layer luxury glitter -->
+  <div style="
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    z-index:1;
+
+    background:
+      radial-gradient(circle, rgba(255,255,255,0.55) 1.4px, transparent 2px),
+      radial-gradient(circle, rgba(255,255,255,0.35) 1.2px, transparent 2px),
+      radial-gradient(circle, rgba(255,255,255,0.25) 1px, transparent 2px),
+      radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 2px);
+
+    background-size:
+      120px 120px,
+      180px 180px,
+      260px 260px,
+      360px 360px;
+
+    background-position:
+      0 0,
+      60px 40px,
+      20px 100px,
+      120px -60px;
+
+    animation: glitterFloat 10s linear infinite, twinkle 2.8s ease-in-out infinite;
+    opacity:0.55;
+  "></div>
+
+  <!-- Soft ambient glow layer -->
+  <div style="
+    position:absolute;
+    inset:0;
+    border-radius:22px;
+    background:linear-gradient(135deg, #1fae67, #74ffbf);
+    filter:blur(26px);
+    opacity:0.22;
+    z-index:0;
+  "></div>
+
+  <div style="position:relative; z-index:5;">
+    <p style="
+      font-size:26px;
+      font-weight:900;
+      margin-bottom:14px;
+      text-shadow:0 2px 8px rgba(0,0,0,0.4);
+      letter-spacing:0.6px;
+    ">
+      ✨ Join Our Exclusive Community ✨
+    </p>
+
+    <p style="
+      font-size:16px;
+      opacity:0.92;
+      margin-bottom:26px;
+      line-height:1.55;
+      font-weight:500;
+    ">
+      <b>Excusive Products, VIP Deals & Limited Time Offers....</b>
+    </p>
+
+    <a href="https://whatsapp.com/channel/0029VbAi5318PgsN84gqIZ3r"
+      target="_blank"
+      style="
+        display:inline-block;
+        padding:20px 42px;
+        background:#ffffff;
+        color:#18a965;
+        font-size:18px;
+        font-weight:900;
+        border-radius:50px;
+        text-decoration:none;
+        line-height:1.35;
+        letter-spacing:0.6px;
+
+        /* Button glow */
+        box-shadow:
+          0 0 20px rgba(31,174,103,1),
+          0 0 40px rgba(31,174,103,0.85),
+          inset 0 0 16px rgba(31,174,103,0.5);
+        transition:all 0.35s ease;
+      "
+      onmouseover="this.style.boxShadow='0 0 34px rgba(31,174,103,1), 0 0 70px rgba(31,174,103,1), inset 0 0 22px rgba(31,174,103,0.7)'; this.style.transform='scale(1.1)'"
+      onmouseout="this.style.boxShadow='0 0 20px rgba(31,174,103,1), 0 0 40px rgba(31,174,103,0.85), inset 0 0 16px rgba(31,174,103,0.5)'; this.style.transform='scale(1)'"
+    >
+      💬 TAP HERE<br>To Join Our FragClub
+    </a>
+  </div>
+</div>
+
+<style>
+@keyframes glowPulse {
+  0% { box-shadow: 0 0 26px rgba(31,174,103,0.65), 0 0 52px rgba(31,174,103,0.45); }
+  50% { box-shadow: 0 0 48px rgba(31,174,103,1), 0 0 92px rgba(31,174,103,0.75); }
+  100% { box-shadow: 0 0 26px rgba(31,174,103,0.65), 0 0 52px rgba(31,174,103,0.45); }
+}
+
+@keyframes glitterFloat {
+  0% { background-position: 0 0, 60px 40px, 20px 100px, 120px -60px; }
+  50% { background-position: 80px -40px, 10px 90px, 90px 40px, 0 120px; }
+  100% { background-position: 0 0, 60px 40px, 20px 100px, 120px -60px; }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity:0.45; }
+  50% { opacity:0.75; }
+}
+</style>
