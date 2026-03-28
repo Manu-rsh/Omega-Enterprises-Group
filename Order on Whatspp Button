@@ -1,0 +1,140 @@
+{% if product.available %}
+<a 
+  href="https://api.whatsapp.com/send?phone=919873468015&text=Hi%2C%20Omega%20Perfumes%20India.%0A%0AI%20want%20to%20order%20this%20product%3A%0A%0A{{ product.title }}%0A%0A{{ shop.url }}/products/{{ product.handle }}" 
+  style="text-decoration: none;" 
+  target="_blank"
+  class="luxury-whatsapp-link"
+>
+  <div class="luxury-whatsapp-btn">
+    <img 
+      src="https://cdn.shopify.com/s/files/1/0921/2051/4924/files/Whatsapp_Logo.png?v=1751782174" 
+      width="22px" 
+      style="vertical-align: middle;"
+    >
+    <span>Order on WhatsApp</span>
+  </div>
+</a>
+{% else %}
+<div class="luxury-whatsapp-btn sold-out">
+  <img 
+    src="https://cdn.shopify.com/s/files/1/0921/2051/4924/files/Whatsapp_Logo.png?v=1751782174" 
+    width="22px" 
+    style="vertical-align: middle; opacity: 0.5;"
+  >
+  <span>Order on WhatsApp</span>
+</div>
+{% endif %}
+
+<style>
+.luxury-whatsapp-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 10px 18px;
+  text-align: center;
+  background: linear-gradient(135deg, #1EA651, #2FCB67);
+  color: #fff;
+  border-radius: 25px;
+  font-weight: bold;
+  font-size: 16px;
+  height: 44px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 12px rgba(46, 204, 113, 0.6), inset 0 0 6px rgba(255, 255, 255, 0.3);
+  transition: transform 0.3s ease;
+  animation: pulseGlow 1.2s infinite ease-in-out;
+}
+
+.luxury-whatsapp-btn:hover {
+  transform: scale(1.05);
+}
+
+/* SOLD OUT style */
+.sold-out {
+  background: #999 !important;
+  cursor: not-allowed;
+  box-shadow: none;
+  animation: none;
+  opacity: 0.6;
+  pointer-events: none; /* disables click */
+}
+
+/* Shimmer line sweeping across */
+.luxury-whatsapp-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.8) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shimmer 1.8s infinite;
+}
+
+/* Soft glitter sparkles */
+.luxury-whatsapp-btn::after {
+  content: "";
+  position: absolute;
+  top: -30%;
+  left: -30%;
+  width: 160%;
+  height: 160%;
+  background-image: radial-gradient(
+      rgba(255, 255, 255, 0.6) 1px,
+      transparent 1px
+  );
+  background-size: 40px 40px;
+  animation: glitter 1.0s infinite linear;
+  pointer-events: none;
+}
+
+/* Remove shimmer & glitter for sold-out */
+.sold-out::before,
+.sold-out::after {
+  display: none !important;
+}
+
+/* Soft glowing pulse */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(46, 204, 113, 0.6), inset 0 0 6px rgba(255, 255, 255, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 24px rgba(46, 204, 113, 0.9), inset 0 0 10px rgba(255, 255, 255, 0.4);
+  }
+}
+
+/* Shimmer movement */
+@keyframes shimmer {
+  0% {
+    left: -75%;
+  }
+  100% {
+    left: 125%;
+  }
+}
+
+/* Glitter twinkling */
+@keyframes glitter {
+  0% {
+    opacity: 0.3;
+    transform: rotate(0deg);
+  }
+  50% {
+    opacity: 0.6;
+    transform: rotate(180deg);
+  }
+  100% {
+    opacity: 0.3;
+    transform: rotate(360deg);
+  }
+}
+</style>
