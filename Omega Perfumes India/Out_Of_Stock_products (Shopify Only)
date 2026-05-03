@@ -1,0 +1,103 @@
+$baseUrl = "https://omegaperfumes.in/"
+$outputFile = "C:\Users\Manu\Desktop\out_of_stock_products.csv"
+
+New-Item -ItemType Directory -Force -Path "C:\Omega Enterprises" | Out-Null
+
+$data = @()
+$page = 1
+
+function Clean-Text($text) {
+    return ($text -replace "`r|`n", " ").Trim()
+}
+
+while ($true) {
+    $url = "$baseUrl/products.json?limit=250&page=$page"
+    Write-Host "Fetching page $page..."
+
+    try {
+        $response = Invoke-RestMethod -Uri $url -Method Get
+    } catch {
+        Write-Host "Error fetching page. Stopping..."
+        break
+    }
+
+    if ($response.products.Count -eq 0) {
+        Write-Host "No more products. Ending..."
+        break
+    }
+
+    foreach ($product in $response.products) {
+
+        foreach ($variant in $product.variants) {
+
+            # 🔍 DEBUG (uncomment if needed)
+            # Write-Host "Product:" $product.title
+            # Write-Host "Available:" $variant.available
+            # Write-Host "Inventory:" $variant.inventory_quantity
+            # Write-Host "-----------------------------"
+
+            # ✅ FILTER: Only OUT-OF-STOCK variants
+            # Logic:
+            # - Skip if available = true
+            # - Skip if inventory > 0
+            if ($variant.available -eq $true -or $variant.inventory_quantity -gt 0) {
+                continue
+            }
+
+            # Image (first image only)
+            $imageSrc = ""
+            $imageAlt = ""
+
+            if ($product.images.Count -gt 0) {
+                $imageSrc = $product.images[0].src
+                $imageAlt = $product.images[0].alt
+            }
+
+            # Options
+            $option1Name = ""
+            $option1Value = $variant.option1
+
+            if ($product.options.Count -gt 0) {
+                $option1Name = $product.options[0].name
+            }
+
+            $row = [PSCustomObject]@{
+                "Created At" = [datetime]$product.created_at
+                "Handle" = $product.handle
+                "Title" = $product.title
+                "Body (HTML)" = Clean-Text($product.body_html)
+                "Tags" = $product.tags
+                "Option1 Name" = $option1Name
+                "Option1 Value" = $option1Value
+                "Variant Price" = $variant.price
+                "Variant Compare At Price" = $variant.compare_at_price
+                "Inventory Quantity" = $variant.inventory_quantity
+                "Available" = $variant.available
+                "Image Src" = $imageSrc
+                "Image Alt Text" = $imageAlt
+                "SEO Title" = ""
+                "SEO Description" = ""
+                "Google Product Category" = ""
+                "Search product boosts" = ""
+            }
+
+            $data += $row
+        }
+    }
+
+    $page++
+}
+
+# ⚠️ If still empty, warn user
+if ($data.Count -eq 0) {
+    Write-Host "⚠️ No out-of-stock products found with current logic."
+}
+
+# ✅ Sort newest → oldest
+$data = $data | Sort-Object "Created At" -Descending
+
+# Export CSV
+$data | Select-Object * -ExcludeProperty "Created At" |
+    Export-Csv -Path $outputFile -NoTypeInformation -Encoding UTF8
+
+Write-Host "✅ CSV exported to $outputFile"
