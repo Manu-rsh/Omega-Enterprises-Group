@@ -1,0 +1,266 @@
+{% liquid
+  assign enable_rtl_setting = settings.enable_rtl
+  assign language_support_rtl = settings.language_support_rtl
+  assign enable_rtl = false
+
+  if enable_rtl_setting and language_support_rtl != blank
+    assign shop_locale = localization.language.iso_code
+    assign rtl_locales = language_support_rtl | split: ','
+
+    for locale in rtl_locales
+      if locale == shop_locale
+        assign enable_rtl = true
+      endif
+    endfor
+  endif
+
+  assign body_classes = 'template-' | append: template.name
+  if template.suffix != blank
+    assign body_classes = body_classes | append: ' ' | append: template.suffix
+  endif
+  assign body_classes = body_classes | append: ' m-gradient m-color-' | append: settings.default_color_scheme
+
+  if settings.page_transition
+    assign body_classes = body_classes | append: ' m:overflow-hidden'
+  endif
+
+  if template.suffix == 'about-us'
+    assign body_classes = body_classes | append: ' sf__page-about'
+  endif
+%}
+
+<!doctype html>
+<html
+  class="no-js{% if settings.page_transition %} m:overflow-hidden{% endif %}"
+  lang="{{ request.locale.iso_code }}"
+  data-template="{{ template.name }}"
+  {% if enable_rtl %}dir="rtl"{% endif %}
+>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
+  <meta name="theme-color" content="{{ settings.color_primary }}">
+  <link rel="canonical" href="{{ canonical_url }}">
+
+  <script src="https://sdk.breezesdk.store/configs/omegaperfumesdotin/crt.js" async></script>
+  <script src="https://sdk.breezesdk.store/nexus/ctrl/shopify/mods/184.0.1/mod.js" async></script>
+
+  {% render 'avada-seo' %}
+
+  <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+
+  {% if settings.use_favicon and settings.favicon != blank %}
+    <link rel="shortcut icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
+  {% endif %}
+
+  {% render 'sr-checkout' %}
+
+  <script>
+    function getUserTimezone() {
+      return Intl.DateTimeFormat().resolvedOptions().timeZone;
+    }
+
+    function renderButton(showShiprocketCheckout) {
+      const styleElement = document.createElement('style');
+      styleElement.textContent = '';
+      document.head.appendChild(styleElement);
+    }
+
+    function checkAndSetButtonVisibility() {
+      const indiaTimezones = ['Asia/Kolkata', 'Asia/Calcutta'];
+      const userTimezone = getUserTimezone();
+      renderButton(indiaTimezones.includes(userTimezone));
+    }
+
+    checkAndSetButtonVisibility();
+  </script>
+
+  <title>
+    {{ page_title }}
+    {% if current_tags %} – {{ current_tags | join: ', ' }}{% endif %}
+    {% if current_page != 1 %} – {{ 'general.meta.page' | t: page: current_page }}{% endif %}
+    {% unless page_title contains shop.name %} – {{ shop.name }}{% endunless %}
+  </title>
+
+  {% if page_description %}
+    <meta name="description" content="{{ page_description | escape }}">
+  {% endif %}
+
+  {% liquid
+    render 'social-meta-tags'
+    render 'font-face'
+    render 'critical-css'
+    echo 'main.css' | asset_url | stylesheet_tag: preload: true
+    render 'style-tags'
+  %}
+
+  <script src="{{ 'vendor.js' | asset_url }}" defer></script>
+  <script src="{{ 'theme-global.js' | asset_url }}" defer></script>
+
+  {% if settings.animations != 'none' %}
+    <script src="{{ 'animations.js' | asset_url }}" defer></script>
+  {% endif %}
+
+  {% if request.design_mode %}
+    <script src="{{ 'theme-editor.js' | asset_url }}" defer></script>
+  {% endif %}
+
+  {{ content_for_header }}
+
+  <script>
+    document.documentElement.className =
+      document.documentElement.className.replace('no-js', 'js');
+    if (Shopify.designMode) {
+      document.documentElement.classList.add('shopify-design-mode');
+    }
+  </script>
+
+  {% render 'theme-data' %}
+  {% render 'custom-code-head' %}
+
+  <meta name="dmca-site-verification" content="NDdUY2tCVjNLSS9YMDdFTm9RT0xIZXBWK2YwV052UjlnL0phOHFROWl5TT01">
+
+  {% render 'pagefly-app-header' %}
+</head>
+
+<body
+  id="m-theme"
+  class="{{ body_classes }}"
+  {% if template.name == 'product' %}data-product-id="{{ product.id }}"{% endif %}
+>
+
+  {% liquid
+    render 'page-transition'
+    render 'scroll-top-button'
+    sections 'header-group'
+  %}
+
+  <main role="main" id="MainContent">
+    {{ content_for_layout }}
+  </main>
+
+  {% liquid
+    sections 'footer-group'
+    render 'script-tags'
+    render 'cookie-banner'
+    render 'custom-code-body'
+  %}
+
+  <script src="{{ 'product-quick-view.js' | asset_url }}" defer></script>
+  <script src="{{ 'wishlist.js' | asset_url }}" defer></script>
+  <script src="{{ 'compare-product.js' | asset_url }}" defer></script>
+
+  {% if settings.enable_predictive_search %}
+    <script src="{{ 'predictive-search.js' | asset_url }}" defer></script>
+  {% endif %}
+
+  {% if linklists['gift-wrapping'].links != blank and linklists['gift-wrapping'].links.first.type == 'product_link' %}
+    <script src="{{ 'gift-wrapping.js' | asset_url }}" defer></script>
+  {% endif %}
+
+  {% if settings.show_swatch_option %}
+    <script src="{{ 'product-card-swatch.js' | asset_url }}" defer></script>
+  {% endif %}
+
+  {% if settings.enable_cart_drawer and template != 'cart' %}
+    {% render 'cart-drawer' %}
+  {% endif %}
+
+  {% render 'whatsapp-btn' %}
+
+  <!-- WHATSAPP COMMUNITY QR POPUP -->
+  <style>
+    #waPopupOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(6px);
+      z-index: 99999;
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+    #waPopupBox {
+      background: radial-gradient(circle at top, #0f0f0f, #050505);
+      border-radius: 26px;
+      padding: 30px 26px;
+      width: 92%;
+      max-width: 400px;
+      text-align: center;
+      color: white;
+      box-shadow: 0 0 60px rgba(37, 211, 102, 0.45);
+      position: relative;
+      animation: waFadeIn 0.6s ease;
+    }
+    @keyframes waFadeIn {
+      from { transform: scale(0.75); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    #waClose {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      font-size: 24px;
+      cursor: pointer;
+      color: #aaa;
+    }
+    #waClose:hover { color: white; }
+    #waPopupBox h2 { font-size: 22px; margin-bottom: 8px; color: #25D366; }
+    #waPopupBox p { font-size: 14px; color: #ccc; margin-bottom: 18px; }
+    .wa-qr-wrap { display: flex; justify-content: center; margin: 18px 0 24px; }
+    .wa-qr-wrap img {
+      width: 220px;
+      height: 220px;
+      border-radius: 18px;
+      border: 4px solid #25D366;
+      box-shadow: 0 0 40px rgba(37, 211, 102, 0.6);
+    }
+    #waJoinBtn {
+      display: inline-block;
+      background: linear-gradient(135deg, #25D366, #1ebe5d);
+      color: #000;
+      padding: 14px 30px;
+      border-radius: 40px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 15px;
+      box-shadow: 0 0 25px rgba(37, 211, 102, 0.9);
+    }
+  </style>
+
+  <div id="waPopupOverlay">
+    <div id="waPopupBox">
+      <div id="waClose" onclick="closeWaPopup()">✕</div>
+      <h2>Join Our VIP WhatsApp Channel</h2>
+      <p>Exclusive Perfume Deals & Secret Offers 👑</p>
+      <div class="wa-qr-wrap">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https://chat.whatsapp.com/Be9mLOikaayGTt9tFuUTzM">
+      </div>
+      <a id="waJoinBtn" href="https://chat.whatsapp.com/Be9mLOikaayGTt9tFuUTzM" target="_blank">
+        Join Now on WhatsApp 🚀
+      </a>
+    </div>
+  </div>
+
+  <script>
+    function closeWaPopup() {
+      document.getElementById("waPopupOverlay").style.display = "none";
+      sessionStorage.setItem("waPopupShown", "yes");
+    }
+    window.addEventListener("load", function () {
+      if (!sessionStorage.getItem("waPopupShown")) {
+        setTimeout(function () {
+          document.getElementById("waPopupOverlay").style.display = "flex";
+        }, 2000);
+      }
+    });
+  </script>
+
+</body>
+</html>
