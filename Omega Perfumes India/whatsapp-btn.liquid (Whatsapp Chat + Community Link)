@@ -1,0 +1,239 @@
+{% assign whatsappNumber = "919873468015" %}
+
+{% assign defaultMessage = "Hi, Omega Perfumes India.%0A%0AI would like to inquire about perfume.%0A%0ACould you please provide more details?" %}
+
+{% assign buttonPosition = "right" %}
+{% assign buttonColor = "#25d366" %}
+{% assign marginBottom = "3.50em" %}
+{% assign marginLeft = "1em" %}
+{% assign marginRight = "1.25em" %}
+{% assign zIndex = "9999" %}
+{% assign showCloseButton = false %}
+
+{%- comment -%}
+✅ Auto-include product name + URL if on product page
+{%- endcomment -%}
+
+{% if template contains 'product' %}
+  {% assign Message =
+    "Hi, Omega Perfumes India.%0A%0A"
+    | append: "I would like to inquire about this product:%0A%0A"
+    | append: product.title
+    | append: "%0A%0A"
+    | append: shop.url
+    | append: product.url
+    | append: "%0A%0A"
+    | append: "Could you please provide more details?"
+  %}
+{% else %}
+  {% assign Message = defaultMessage %}
+{% endif %}
+
+{% if buttonPosition == "left" %}
+  {% assign positionStyle = "left: " | append: marginLeft %}
+{% else %}
+  {% assign positionStyle = "right: " | append: marginRight %}
+{% endif %}
+
+<style>
+  .whatsapp-button-container {
+    position: fixed;
+    bottom: {{ marginBottom }};
+    {{ positionStyle }};
+    z-index: {{ zIndex }};
+  }
+
+  .whatsapp-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: {{ buttonColor }};
+    color: #fff;
+    border-radius: 50%;
+    width: 3em;
+    height: 3em;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+    cursor: pointer;
+    position: relative;
+    animation: pulse 2s infinite ease-in-out;
+    text-decoration: none;
+  }
+
+  .whatsapp-button img {
+    width: 2em;
+    height: 2em;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.12); }
+  }
+
+  /* Popup */
+  .whatsapp-popup {
+    position: absolute;
+    bottom: 115%;
+    right: 0;
+    width: 250px;
+    background: #fff;
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+    transition: all 0.3s ease;
+  }
+
+  .whatsapp-popup.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .popup-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #111;
+    text-align: center;
+  }
+
+  .popup-option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    width: 100%;
+    padding: 11px 12px;
+    margin-bottom: 10px;
+
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+  }
+
+  .popup-option.chat {
+    background: #25d366;
+    color: white;
+  }
+
+  .popup-option.community {
+    background: #f3f4f6;
+    color: #111;
+  }
+
+  .popup-option:hover {
+    transform: translateY(-1px);
+    opacity: 0.95;
+  }
+
+  .popup-option:last-child {
+    margin-bottom: 0;
+  }
+
+  .close-button {
+    position: absolute;
+    top: -0.5em;
+    right: -0.5em;
+    background-color: black;
+    color: white;
+    width: 1.25em;
+    height: 1.25em;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 1.25em;
+    font-weight: bold;
+    cursor: pointer;
+    display: {% if showCloseButton %}block{% else %}none{% endif %};
+  }
+
+  @media screen and (max-width: 768px) {
+    .whatsapp-popup {
+      width: 230px;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+
+    const button = document.querySelector('.whatsapp-button');
+    const popup = document.querySelector('.whatsapp-popup');
+    const container = document.querySelector('.whatsapp-button-container');
+
+    button.addEventListener('click', function(e) {
+      e.preventDefault();
+      popup.classList.toggle('show');
+    });
+
+    document.addEventListener('click', function(e) {
+      if (!container.contains(e.target)) {
+        popup.classList.remove('show');
+      }
+    });
+
+    const closeBtn = document.querySelector('.close-button');
+
+    if (closeBtn) {
+      closeBtn.addEventListener('click', function() {
+        container.style.display = 'none';
+      });
+    }
+
+  });
+</script>
+
+<div class="whatsapp-button-container">
+
+  <div class="whatsapp-popup">
+
+    <div class="popup-title">
+      👋 How would you like to connect?
+    </div>
+
+    <!-- Chat -->
+    <a
+      class="popup-option chat"
+      href="https://api.whatsapp.com/send?phone={{ whatsappNumber }}&text={{ Message }}"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      💬 Chat on WhatsApp
+    </a>
+
+    <!-- Community -->
+    <a
+      class="popup-option community"
+      href="https://chat.whatsapp.com/Be9mLOikaayGTt9tFuUTzM"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      👥 Join WhatsApp Community
+    </a>
+
+  </div>
+
+  <!-- Floating Button -->
+  <a
+    class="whatsapp-button"
+    href="#"
+    aria-label="WhatsApp Options"
+  >
+    <img
+      src="https://cdn.shopify.com/s/files/1/0921/2051/4924/files/Whatsapp_Logo.png?v=1751782174"
+      alt="WhatsApp"
+    />
+  </a>
+
+  {% if showCloseButton %}
+    <div class="close-button">×</div>
+  {% endif %}
+
+</div>
